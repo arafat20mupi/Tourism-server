@@ -4,8 +4,6 @@ const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
-// Tourism-Server
-// tQ3QW0Uhc17A3ujZ
 
 const app = express();
 const port = process.env.PORT || 5000;
