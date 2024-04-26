@@ -29,23 +29,22 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
+        const database = client.db('touristsDB')
+        const userCollection = database.collection("tourists");
 
 
-        
-        const database = client.db('userDB')
-		const userCollection = database.collection("users");
+        app.post('/tourists', async (req, res) => {
+            const user = req.body;
+            console.log('new user ', user)
+            const result = await userCollection.insertOne(user);
+            res.send(result)
+        })
 
-
-
-
-
-
-
-
-
-
-
-
+        app.get('/tourists', async (req, res) => {
+			const cursor = userCollection.find()
+			const result = await cursor.toArray();
+			res.send(result)
+		});
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -58,9 +57,9 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Coffee making server is running');
+    res.send('tourists making server is running');
 });
 
 app.listen(port, () => {
-    console.log(`Coffee server is running on port: ${port}`);
+    console.log(`tourists server is running on port: ${port}`);
 });
