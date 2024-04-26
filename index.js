@@ -27,7 +27,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
 
         const database = client.db('touristsDB')
         const userCollection = database.collection("tourists");
@@ -45,6 +45,13 @@ async function run() {
 			const result = await cursor.toArray();
 			res.send(result)
 		});
+        app.get('/tourists/:id', async (req, res) => {
+			const id = req.params.id;
+			const quary = { _id: new ObjectId(id) }
+			const user = await userCollection.findOne(quary)
+			res.send(user)
+		})
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
