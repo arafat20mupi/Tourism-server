@@ -30,27 +30,54 @@ async function run() {
         // await client.connect();
 
         const database = client.db('touristsDB')
-        const userCollection = database.collection("tourists");
+        const touristsCollection = database.collection("tourists");
 
+        const userCollection = client.db('touristsDB').collection("users");
 
-        app.post('/tourists', async (req, res) => {
+        app.post('/user', async (req, res) => {
             const user = req.body;
             console.log('new user ', user)
             const result = await userCollection.insertOne(user);
             res.send(result)
         })
 
+        app.get('/user', async (req, res) => {
+            const cursor = userCollection.find()
+            const result = await cursor.toArray();
+            res.send(result)
+        });
+        app.get('/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const quary = { _id: new ObjectId(id) }
+            const user = await userCollection.findOne(quary)
+            res.send(user)
+        });
+        app.delete( "/user/:id" ,async (req , res) =>{
+            const id = req.params.id;
+            const quary = { _id : new ObjectId(id)} ;
+            const result = await userCollection.deleteOne(quary);
+            res.send(result) 
+            
+        })
+
+        app.post('/tourists', async (req, res) => {
+            const user = req.body;
+            console.log('new user ', user)
+            const result = await touristsCollection.insertOne(user);
+            res.send(result)
+        })
+
         app.get('/tourists', async (req, res) => {
-			const cursor = userCollection.find()
-			const result = await cursor.toArray();
-			res.send(result)
-		});
+            const cursor = touristsCollection.find()
+            const result = await cursor.toArray();
+            res.send(result)
+        });
         app.get('/tourists/:id', async (req, res) => {
-			const id = req.params.id;
-			const quary = { _id: new ObjectId(id) }
-			const user = await userCollection.findOne(quary)
-			res.send(user)
-		})
+            const id = req.params.id;
+            const quary = { _id: new ObjectId(id) }
+            const user = await touristsCollection.findOne(quary)
+            res.send(user)
+        });
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
