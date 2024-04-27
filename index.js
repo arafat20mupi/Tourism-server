@@ -59,6 +59,26 @@ async function run() {
             res.send(result) 
             
         })
+        app.put('/user/:id' , async (req, res ) =>{
+            const id = req.params.id;
+            const filter = { _id : new ObjectId(id)}
+            const options = {upsert: true}
+            const updatedTourist = req.body
+            const tourists ={
+                $set: {
+                    userName : updatedTourist.userName,
+                    spotName: updatedTourist.spotName, 
+                    countryName: updatedTourist.countryName ,
+                    description :updatedTourist.description,
+                    averageCost :updatedTourist.averageCost,
+                    travelTime :updatedTourist.travelTime,
+                    image:updatedTourist.image,
+                    totalVisitorsPerYear:updatedTourist.totalVisitorsPerYear
+                }
+            }
+            const result = await userCollection.updateOne(filter , tourists,options )
+            res.send(result)
+        });	
 
         app.post('/tourists', async (req, res) => {
             const user = req.body;
