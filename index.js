@@ -11,10 +11,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.ykgi9mv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
     serverApi: {
@@ -34,6 +31,19 @@ async function run() {
 
         const userCollection = client.db('touristsDB').collection("users");
         const extraCollection = client.db('touristsDB').collection("ExtraData");
+
+
+        app.get('/country_Name', async (req, res) => {
+            const categories = await extraCollection.find({}).toArray();
+            res.send(categories);
+          })
+      
+          app.get('/country_Name/:country_Name', async (req, res) => {
+            const subcategory = req.params.country_Name;
+            const products = await extraCollection.find({ country_Name: subcategory }).toArray();
+            res.send(products);
+        });
+
 
         app.post('/user', async (req, res) => {
             const user = req.body;
@@ -99,30 +109,6 @@ async function run() {
             const user = await touristsCollection.findOne(quary)
             res.send(user)
         });
-        app.post('/extra', async (req, res) => {
-            const user = req.body;
-            console.log('new user ', user)
-            const result = await extraCollection.insertOne(user);
-            res.send(result)
-        })
-
-        app.get('/extra', async (req, res) => {
-            const cursor = extraCollection.find()
-            const result = await cursor.toArray();
-            res.send(result)
-        });
-        app.get('/extra/country_Name', async (req, res) => {
-            try {
-                const countryName = req.query.country_Name; 
-                const cursor = extraCollection.find({ country_Name: countryName });
-                const result = await cursor.toArray();
-                res.json(result); 
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ message: 'Internal server error' });
-            }
-        });
-
 
 
         // Send a ping to confirm a successful connection
