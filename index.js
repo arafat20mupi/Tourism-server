@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-
 require('dotenv').config();
+
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
@@ -32,25 +32,30 @@ async function run() {
         const userCollection = client.db('touristsDB').collection("users");
         const extraCollection = client.db('touristsDB').collection("ExtraData");
 
-
+        // extraCollection
         app.get('/country_Name', async (req, res) => {
             const categories = await extraCollection.find({}).toArray();
             res.send(categories);
-          })
-      
-          app.get('/country_Name/:country_Name', async (req, res) => {
-            const subcategory = req.params.country_Name;
-            const products = await extraCollection.find({ country_Name: subcategory }).toArray();
-            res.send(products);
         });
 
-
+        app.get('/country_Name/:countryName', async (req, res) => {
+            const subcategory = req.params.countryName;
+            const products = await extraCollection.find({ countryName: subcategory }).toArray();
+            res.send(products);
+        });
+        app.get('/country/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await extraCollection.findOne(query);
+            res.send(result);
+        });
+        // userCollection
         app.post('/user', async (req, res) => {
             const user = req.body;
             console.log('new user ', user)
             const result = await userCollection.insertOne(user);
             res.send(result)
-        })
+        });
 
         app.get('/user', async (req, res) => {
             const cursor = userCollection.find()
@@ -90,7 +95,7 @@ async function run() {
             const result = await userCollection.updateOne(filter, tourists, options)
             res.send(result)
         });
-
+        // touristsCollection
         app.post('/tourists', async (req, res) => {
             const user = req.body;
             console.log('new user ', user)
