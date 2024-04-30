@@ -45,7 +45,7 @@ async function run() {
         });
         app.get('/country/:id', async (req, res) => {
             const id = req.params.id;
-            const query = { _id: new ObjectId(id) };
+            const query = { _id: ObjectId.createFromHexString(id) };
             const result = await extraCollection.findOne(query);
             res.send(result);
         });
@@ -62,22 +62,17 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result)
         });
+
+
         app.get('/user/:id', async (req, res) => {
             const id = req.params.id;
-            const quary = { _id: new ObjectId(id) }
-            const user = await userCollection.findOne(quary)
+            const quary = { _id: ObjectId.createFromHexString(id) }
+            const user = await touristsCollection.findOne(quary)
             res.send(user)
         });
-        app.delete("/user/:id", async (req, res) => {
-            const id = req.params.id;
-            const quary = { _id: new ObjectId(id) };
-            const result = await userCollection.deleteOne(quary);
-            res.send(result)
-
-        })
         app.put('/user/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = { _id: new ObjectId(id) }
+            const filter = { _id: ObjectId.createFromHexString(id) }
             const options = { upsert: true }
             const updatedTourist = req.body
             const tourists = {
@@ -89,13 +84,24 @@ async function run() {
                     averageCost: updatedTourist.averageCost,
                     travelTime: updatedTourist.travelTime,
                     image: updatedTourist.image,
+                    seasonality: updatedTourist.seasonality,
+                    countryName: updatedTourist.countryName,
+                    location: updatedTourist.location,
                     totalVisitorsPerYear: updatedTourist.totalVisitorsPerYear
                 }
             }
-            const result = await userCollection.updateOne(filter, tourists, options)
+            const result = await touristsCollection.updateOne(filter, tourists, options)
             res.send(result)
         });
-        // touristsCollection
+
+        app.delete("/user/:id", async (req, res) => {
+            const id = req.params.id;
+            const quary = { _id: ObjectId.createFromHexString(id) };
+            const result = await touristsCollection.deleteOne(quary);
+            res.send(result)
+
+        })
+
         app.post('/tourists', async (req, res) => {
             const user = req.body;
             console.log('new user ', user)
@@ -110,17 +116,17 @@ async function run() {
         });
         app.get('/tourists/:id', async (req, res) => {
             const id = req.params.id;
-            const quary = { _id: new ObjectId(id) }
+            const quary = { _id: ObjectId.createFromHexString(id) }
             const user = await touristsCollection.findOne(quary)
             res.send(user)
         });
 
-        app.get('/tourists/email/:email', async (req, res) => {
+        app.get('/user/email/:email', async (req, res) => {
             const email = req.params.email;
             const data = await touristsCollection.find({ email: email }).toArray();
             res.send(data);
         });
-        
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
